@@ -1,0 +1,114 @@
+{
+   "results":[
+      {
+         "title":"Service with a Smile",
+         "author":"Coeur Al'Aran",
+         "rating":"Fiction T",
+         "language":"English",
+         "genres":[
+            "Romance",
+            "Friendship"
+         ],
+         "characters":[
+            "Jaune A."
+         ],
+         "romances":[
+
+         ],
+         "chapters":41,
+         "word_count":283543,
+         "reviews":6105,
+         "favs":6639,
+         "follows":7400,
+         "published":"8/8/2017",
+         "updated":"3/12",
+         "id":12606073
+      },
+      {
+         "title":"Game Over",
+         "author":"Frog-kun",
+         "rating":"Fiction T",
+         "language":"English",
+         "genres":[
+            "Tragedy",
+            "Family"
+         ],
+         "characters":[
+            "Kirito/Kazuto K.",
+            "Leafa/Suguha K."
+         ],
+         "romances":[
+
+         ],
+         "chapters":1,
+         "word_count":3324,
+         "reviews":90,
+         "favs":343,
+         "follows":94,
+         "published":"10/25/2012",
+         "updated":"",
+         "id":8640725
+      },
+      {
+         "title":"SAO: Nobody Dies",
+         "author":"HuuskerDu",
+         "rating":"Fiction T",
+         "language":"English",
+         "genres":[
+            "Drama",
+            "Romance"
+         ],
+         "characters":[
+            "Kirito/Kazuto K.",
+            "Asuna/Asuna Y.",
+            "Sachi",
+            "Leafa/Suguha K."
+         ],
+         "romances":[
+
+         ],
+         "chapters":20,
+         "word_count":149784,
+         "reviews":174,
+         "favs":285,
+         "follows":284,
+         "published":"7/28/2017",
+         "updated":"7/29/2018",
+         "id":12590747
+      },
+      {
+         "title":"Big Brother is Listening to You",
+         "author":"Holz9364",
+         "rating":"Fiction M",
+         "language":"English",
+         "genres":[
+            "Friendship",
+            "Romance"
+         ],
+         "characters":[
+            "Harry P.",
+            "Daphne G.",
+            "Draco M.",
+            "Gabrielle D."
+         ],
+         "romances":[
+            [
+               "Harry P.",
+               "Daphne G."
+            ],
+            [
+               "Draco M.",
+               "Gabrielle D."
+            ]
+         ],
+         "chapters":25,
+         "word_count":143729,
+         "reviews":328,
+         "favs":801,
+         "follows":593,
+         "published":"1/15/2014",
+         "updated":"5/17/2015",
+         "id":10025439
+      }
+   ]
+}
