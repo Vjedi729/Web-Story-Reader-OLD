@@ -4,11 +4,11 @@ import json
 
 import parse_utils as p
 
-class FFnet_Scraper():
+class FFnet_Story():
     """docstring for FFnet_Scraper."""
 
     def __init__(self, story_url):
-        super(FFnet_Scraper, self).__init__()
+        super(FFnet_Story, self).__init__()
         page = urllib.request.urlopen(story_url)
         html = BeautifulSoup(page, 'html.parser')
         info_box = html.find(id='profile_top')
@@ -88,4 +88,4 @@ def test():
                 ]
     
     for url in test_urls:
-        print(FFnet_Scraper(url).toJson())
+        print(FFnet_Story(url).toJson())

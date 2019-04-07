@@ -11,7 +11,7 @@ LINE 36 FROM:   https://brokenbad.com/address-reuse-in-pythons-socketserver/
 #import http.server
 import socketserver
 import urllib
-from ffnet_scraper import FFnet_Scraper
+from ffnet_scraper import FFnet_Story
 import parse_utils as p
 import djangoApi as dj 
 
@@ -47,7 +47,7 @@ def api_function(string):
                     dj.runQuery(query)
                     )
     if method == "/URL?=":
-        story = FFnet_Scraper(query)
+        story = FFnet_Story(query)
         if label == "GET":
             return dj.makeHttpResponse(
                     "200 OK",
