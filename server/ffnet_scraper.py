@@ -79,7 +79,6 @@ class FFnet_Story():
         sql = """INSERT INTO %s %s VALUES %s"""%(table_name, columns_string,values_string)
         return sql
 
-
 def test():
     test_urls = ["https://www.fanfiction.net/s/12606073/39/"
                 ,"https://www.fanfiction.net/s/8640725/1/Game-Over"
