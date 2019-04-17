@@ -9,5 +9,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.search_filter, name='story-filter')
+    path('', views.search_filter, name='story-filter'),
+    path('api/', views.api, name='story-search-api')
 ]
