@@ -5,7 +5,10 @@ from django.http import HttpResponse
 def search_filter(request):
     return HttpResponse('<h1>Search Page</h1>')
 
-#from fanfic_scraper import ao3_scraper
+from .website_crawler import Ao3_crawler
+def update_ao3(request):
+    Ao3_crawler(limit = 1000)
+    return HttpResponse('<h1>Update Complete, Check Admin Page</h1>')
 
 def api(request):
     query_json = request.body

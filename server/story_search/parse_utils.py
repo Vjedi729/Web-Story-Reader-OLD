@@ -1,4 +1,5 @@
 import re
+from datetime import date
 
 def clean_string(string):
     return ' '.join(string.split())
@@ -20,3 +21,9 @@ def read_character_string(string):
     romances = map(clean_character_list, re.findall("\[.*?\]", string))
     characters = clean_character_list(string)
     return list(characters), list(romances)
+
+def read_date(string):
+	if string is None:
+		return None
+	x = string.split('-')
+	return x# date(int(year), int(month), int(day))

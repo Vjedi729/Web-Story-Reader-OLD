@@ -7,6 +7,8 @@ Created on Sat Apr  6 13:47:12 2019
 import json
 import enum
 
+from .models import Author, Fandom, Story, Relationship, Tag, Character, Chapter
+
 class StoryType(enum.Enum):
     FFnet   = 0
     Ao3     = 1
@@ -104,3 +106,6 @@ class WSR_Story:
 
     def toJson(self):
         return json.dumps(self.toDict())
+
+    def saveToDB(self):
+        pass

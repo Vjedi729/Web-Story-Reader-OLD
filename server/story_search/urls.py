@@ -10,5 +10,6 @@ from . import views
 
 urlpatterns = [
     path('', views.search_filter, name='story-filter'),
-    path('api/', views.api, name='story-search-api')
+    path('api/search/', views.api, name='story-search-api')
+    #path('api/read_list')
 ]
