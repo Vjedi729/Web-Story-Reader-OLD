@@ -28,10 +28,9 @@ class WSR_Story:
         # Tags
         'TODO: Change tags to match database structure'
         self.fandoms        = story.fandoms
-        self.genres         = story.genres
         self.characters     = story.characters
         self.relationships  = story.romances
-        self.other_tags     = []
+        self.other_tags     = story.genres
         # Lengths
         self.word_count     = story.word_count
         self.chapter_count  = story.chapter_count
@@ -53,7 +52,6 @@ class WSR_Story:
         # Tags
         'TODO: Change tags to match database structure'
         self.fandoms        = story.fandoms
-        self.genres         = []
         self.characters     = story.characters
         self.relationships  = story.relationships
         self.other_tags     = story.other_tags
@@ -85,7 +83,6 @@ class WSR_Story:
         d['rating']         = self.rating
         d['language']       = self.language
         # Tags
-        d['genres']         = self.genres
         d['fandoms']        = self.fandoms
         d['characters']     = self.characters
         d['relationships']  = self.relationships
