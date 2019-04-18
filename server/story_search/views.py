@@ -5,7 +5,7 @@ from django.http import HttpResponse
 def search_filter(request):
     return HttpResponse('<h1>Search Page</h1>')
 
-import fanfic_scraper as ffs
+#from fanfic_scraper import ao3_scraper
 
 def api(request):
     query_json = request.body
