@@ -3,7 +3,7 @@ from django.http import HttpResponse
 # Create your views here.
 
 def search_filter(request):
-    return HttpResponse('<h1>Search Page</h1>')
+    return HttpResponse('<h1>Search Page Does Not Exist Yet</h1>')
 
 from .website_crawler import Ao3_Crawler
 def update_ao3(request):
@@ -28,4 +28,11 @@ def search_api(request):
     return HttpResponse(myjson, content_type='application/json')
 
 def read_list_api(request):
-    return HttpResponse('')
+    if request.method == 'GET':
+        return HttpResponse('')
+    elif request.method == 'POST':
+        r_json = request.body
+        r_dict = json.loads(r_json)
+        r_type = r_dict.get('type')
+        r_story_id = r_dict.get('story_id')
+        return HttpResponse('')

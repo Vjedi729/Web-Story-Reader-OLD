@@ -67,6 +67,7 @@ class WSR_Story:
         self.comment_count  = story.comment_count
 
     def from_DB(self, story):
+        self.id             = story.pk
         self.title          = str(story.title)
         self.author         = str(story.author)
         self.rating         = str(story.rating)
@@ -105,7 +106,7 @@ class WSR_Story:
     def toDict(self):
         d = {}
         if self.id is not None:
-            d['_id'] = self.id
+            d['story_id'] = self.id
         # Basic Information
         d['title']          = self.title
         d['author']         = self.author
@@ -128,8 +129,8 @@ class WSR_Story:
         d['comments']       = self.comment_count
         return d
 
-    def toJson(self):
-        return json.dumps(self.toDict())
+    def toJson(self, indent = None):
+        return json.dumps(self.toDict(), indent=indent)
 
     def saveToDB(self):
         ao3 = self.author.get('ao3')
