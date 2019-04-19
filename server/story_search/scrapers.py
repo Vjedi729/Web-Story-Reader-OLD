@@ -5,17 +5,23 @@ from datetime import date
 
 # Internal
 import story_search.parse_utils as p
+#import parse_utils as p
 
 class Ao3_Story():
     """docstring for Ao3_Story."""
 
-    site_url = "https://archiveofourown.org"
+    base_site = "https://archiveofourown.org"
 
     def tag_strip(tag_dd_section):
         if tag_dd_section is None:
             return []
         else:
             return [str(x.text) for x in tag_dd_section.find_all('li')]
+    def num_strip(num_section):
+        if num_section is None:
+            return 0
+        else:
+            return int(num_section.text)
 
     def dd_find(info_box, name):
         return info_box.find('dd', {"class":name})
@@ -24,61 +30,101 @@ class Ao3_Story():
         super(Ao3_Story, self).__init__()
         page = urllib.request.urlopen(story_url)
         html = BeautifulSoup(page, 'html.parser')
+        outer = html.find('div', id='outer')
 
         # By pass adult content warning if necessary
-        y = html.find('a', text="Proceed")
-        if y is not None:
-            url = y.get('href')
-            story_url = Ao3_Story.site_url + url
-            page = urllib.request.urlopen(story_url)
+        y = outer.find('a', text="Proceed")
+        curr_url = story_url
+        while y is not None:
+            #print('Bypassing')
+            curr_url = Ao3_Story.base_site + y.get('href')
+            page = urllib.request.urlopen(curr_url)
             html = BeautifulSoup(page, 'html.parser')
+            outer = html.find('div', id='outer')
+            y = outer.find('a', text="Proceed")
+
+        #print('Bypassed')
+
 
         # Extract Story Tags
-        x = html.find(id='main')
-        x = x.find('div', {"class":"work"})
-        info_box = x.find('div', {"class":"wrapper"})
+        x = outer.find(id='main')
+        #print(str(x)[:5000])
+        z = x.find('div', {"class":"work"})
+        if z is not None:
+            info_box = z.find('div', {"class":"wrapper"})
+            if info_box is None:
+                info_box = x.find('div', {"class":"wrapper"})
+        else:
+            info_box = x.find('div', {"class":"wrapper"})
+        if info_box is None:
+            raise ValueError("Could not find Info Box")
 
-        self.rating         = Ao3_Story.dd_find(info_box, "rating tags")
+        self.rating         = p.clean_string(Ao3_Story.dd_find(info_box, "rating tags").text)
         self.fandoms        = Ao3_Story.tag_strip(Ao3_Story.dd_find(info_box, "fandom tags"))
         self.characters     = Ao3_Story.tag_strip(Ao3_Story.dd_find(info_box, 'character tags'))
-        self.relationships  = Ao3_Story.tag_strip(Ao3_Story.dd_find(info_box, 'relationship tags'))
+        self.relationships  = [p.read_relationship(x) for x in Ao3_Story.tag_strip(Ao3_Story.dd_find(info_box, 'relationship tags'))]
         self.categories     = Ao3_Story.tag_strip(Ao3_Story.dd_find(info_box, 'category tags'))
         self.other_tags     = Ao3_Story.tag_strip(Ao3_Story.dd_find(info_box, 'freeform tags'))
         self.warnings       = Ao3_Story.tag_strip(Ao3_Story.dd_find(info_box, 'warning tags'))
-        self.language       = Ao3_Story.dd_find(info_box, "language")
+        self.language       = p.clean_string(Ao3_Story.dd_find(info_box, "language").text)
 
         self.publish_date   = p.read_date(Ao3_Story.dd_find(info_box, "published").text)
-        self.status         = p.clean_string(info_box.find('dt', {"class":"status"}).text)[:-1]
-        self.update_date    = p.read_date(Ao3_Story.dd_find(info_box, "status").text)
-        self.word_count     = int(Ao3_Story.dd_find(info_box, "words").text)
+        update_date_box = Ao3_Story.dd_find(info_box, "status")
+        if update_date_box is not None:
+            self.update_date= p.read_date(Ao3_Story.dd_find(info_box, "status").text)
+            self.status     = p.clean_string(info_box.find('dt', {"class":"status"}).text)[:-1]
+        else:
+            self.status     = "Completed"
+            self.update_date= self.publish_date
+        self.word_count     = Ao3_Story.num_strip(Ao3_Story.dd_find(info_box, "words"))
         self.chapter_count  = int(Ao3_Story.dd_find(info_box, "chapters").text.split("/")[0])
-        self.comment_count  = int(Ao3_Story.dd_find(info_box, "comments").text)
-        self.kudo_count     = int(Ao3_Story.dd_find(info_box, "kudos").text)
-        self.bookmark_count = int(Ao3_Story.dd_find(info_box, "bookmarks").text)
-        self.hit_count      = int(Ao3_Story.dd_find(info_box, "hits").text)
+        self.comment_count  = Ao3_Story.num_strip(Ao3_Story.dd_find(info_box, "comments"))
+        self.kudo_count     = Ao3_Story.num_strip(Ao3_Story.dd_find(info_box, "kudos"))
+        self.bookmark_count = Ao3_Story.num_strip(Ao3_Story.dd_find(info_box, "bookmarks"))
+        self.hit_count      = Ao3_Story.num_strip(Ao3_Story.dd_find(info_box, "hits"))
 
         # Extract Title/Author
         content_box = x.find('div', id='workskin')
-        self.title = content_box.find('h2', {'class':'title heading'})
-        self.author = content_box.find('a', {'rel':'author'})
+        self.title = p.clean_string(content_box.find('h2', {'class':'title heading'}).text)
+        author_box = content_box.find('a', {'rel':'author'})
+        if author_box is None:
+            self.author = {"name":'Anonymous', 'url':''}
+        else:
+            self.author = {'name':p.clean_string(author_box.text), 'url':Ao3_Story.base_site+author_box.get('href')}
+
+        # Get Chapter titles and urls
+        chapter_select = x.find('select', id='selected_id')
+        if chapter_select is not None:
+            self.chapters = []
+            for chapter in chapter_select.find_all('option'):
+                chapter_number, chapter_title = chapter.text.split(" ", 1)
+                chapter_number = int(chapter_number[:-1])
+                chapter_url = story_url + '/chapters/' + chapter.get('value')
+                self.chapters.append({'title':chapter_title,
+                                      'number':chapter_number,
+                                      'url':chapter_url})
+            assert(len(self.chapters) == self.chapter_count)
+        else:
+            self.chapters = [{'title':'', 'number':1, 'url':curr_url}]
 
     def toDict(self):
         d = {}
-        d['title']          = p.clean_string(self.title.text)
-        d['author']         = p.clean_string(self.author.text)
-        d['rating']         = p.clean_string(self.rating.text)
+        d['title']          = self.title
+        d['author']         = self.author
+        d['rating']         = self.rating
         d['warnings']       = self.warnings
         d['categories']     = self.categories
         d['fandoms']        = self.fandoms
         d['characters']     = self.characters
         d['relationships']  = self.relationships
         d['other_tags']     = self.other_tags
-        d['language']       = p.clean_string(self.language.text)
+        d['language']       = self.language
         d['publish date']   = self.publish_date
         d['status']         = self.status
         d['update date']    = self.update_date
         d['word count']     = self.word_count
         d['chapter count']  = self.chapter_count
+        d['chapters']       = self.chapters
         d['kudo count']     = self.kudo_count
         d['bookmark count'] = self.bookmark_count
         d['comment count']  = self.comment_count
@@ -164,25 +210,26 @@ class FFnet_Story():
         return sql
 
 if __name__ == "__main__":
-    print('Testing Ao3 Scraper')
-    test_urls = ["https://archiveofourown.org/works/4265619/chapters/9657279" # Has Explicit Content Warning
-                ,"https://archiveofourown.org/works/12805206/chapters/29490435#workskin" # Has many characters
-                ,"https://archiveofourown.org/works/12088434/chapters/31821954" # Multiple Fandoms
-                , "https://archiveofourown.org/works/5111873/chapters/14271274"
-                , "https://archiveofourown.org/works/13521369/chapters/31015518"
-                , "https://archiveofourown.org/works/15343806/chapters/35686365"
-                ]
+    if(True):
+        print('Testing Ao3 Scraper')
+        test_urls = ["https://archiveofourown.org/works/4265619/" # Has Explicit Content Warning
+                    ,"https://archiveofourown.org/works/12805206/" # Has many characters
+                    ,"https://archiveofourown.org/works/12088434/" # Multiple Fandoms
+                    , "https://archiveofourown.org/works/5111873/"
+                    , "https://archiveofourown.org/works/13521369/"
+                    , "https://archiveofourown.org/works/15343806/"
+                    ]
 
-    for url in test_urls:
-        #Ao3_Story(url)
-        print(Ao3_Story(url).toJson())
+        for url in test_urls:
+            #Ao3_Story(url)
+            print(Ao3_Story(url).toJson())
+    if(False):
+        print('Testing FFnet Scraper')
+        test_urls = ["https://www.fanfiction.net/s/12606073/39/"
+                    ,"https://www.fanfiction.net/s/8640725/1/Game-Over"
+                    ,"https://www.fanfiction.net/s/12590747/11/"
+                    ,"https://www.fanfiction.net/s/10025439/25/"
+                    ]
 
-    print('Testing FFnet Scraper')
-    test_urls = ["https://www.fanfiction.net/s/12606073/39/"
-                ,"https://www.fanfiction.net/s/8640725/1/Game-Over"
-                ,"https://www.fanfiction.net/s/12590747/11/"
-                ,"https://www.fanfiction.net/s/10025439/25/"
-                ]
-
-    for url in test_urls:
-        print(FFnet_Story(url).toJson())
+        for url in test_urls:
+            print(FFnet_Story(url).toJson())

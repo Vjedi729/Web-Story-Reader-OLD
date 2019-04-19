@@ -8,35 +8,35 @@
 
   "rating":"Maximum Rating",
   "languages": ["Language to include", "Another language to include"],
-  "status": ["Status to include", "Aother status to include"], ## Each status is "{COMPLETE/INCOMPLETE}", with others to be added
+  "status": ["Status to include", "Another status to include"], ## Each status is "{COMPLETE/INCOMPLETE}", with others to be added
 
 ## TAGS
   "fandoms":{
-    "include all":["tag1", "tag2"], ## Must include all of these
-    "include any": ["tag3", "tag4"], ## Must include at least one of these
-    "include none":["tag5", "tag6"], ## Must not include any of these
+    "include_all":["tag1", "tag2"], ## Must include all of these
+    "include_any": ["tag3", "tag4"], ## Must include at least one of these
+    "include_none":["tag5", "tag6"], ## Must not include any of these
   },
   "characters":{
-    "include all":["character1", "character2"],
-    "include any": ["character3", "character4"],
-    "include none":["character5", "charcter6"],
+    "include_all":["character1", "character2"],
+    "include_any": ["character3", "character4"],
+    "include_none":["character5", "charcter6"],
   },
   "relationships":{
-    "include all":[ # Will also count multiperson relationships including all of these characters
+    "include_all":[ # Will also count multiperson relationships including all of these characters
       ["character1", "character2"],
       ["character3", "character4"]
     ],
-    "include any": [
+    "include_any": [
       ["character5", "character6"]
     ],
-    "include none":[ ## Will also block multi-person relationships including these characters in a group
+    "include_none":[ ## Will also block multi-person relationships including these characters in a group
       ["character5", "character6"]
     ],
   },
   "other tags":{
-    "include all":["tag1", "tag2"],
-    "include any":["tag3", "tag4"],
-    "include none":["tag5", "tag6"]
+    "include_all":["tag1", "tag2"],
+    "include_any":["tag3", "tag4"],
+    "include_none":["tag5", "tag6"]
   },
 
 ## NUMERICS
@@ -44,9 +44,9 @@
   "word_query_type": "{GREATER/LESS}",
   "chapter_count": 0,
   "chapter_query_type": "{GREATER/LESS}",
-  "publish_date": 0,
+  "publish_date": "1970-1-1",
   "publish_date_query_type": "{GREATER/LESS}",
-  "update_date": 0,
+  "update_date": "1970-1-1",
   "update_date_query_type": "{GREATER/LESS}",
   "like_count": 0,
   "like_query_type": "{GREATER/LESS}",

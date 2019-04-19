@@ -25,5 +25,13 @@ def read_character_string(string):
 def read_date(string):
 	if string is None:
 		return None
-	x = string.split('-')
-	return x# date(int(year), int(month), int(day))
+	year, month, day = string.split('-')
+	return date(int(year), int(month), int(day))
+
+def read_relationship(string):
+    if '/' in string:
+        return [clean_string(x) for x in string.split('/')]
+    elif '&' in string:
+        return [clean_string(x) for x in string.split('&')]
+    else:
+        return string.split()
