@@ -91,3 +91,13 @@ class Chapter(models.Model):
     title = models.CharField(max_length=255, null=True)
     url = models.URLField()
     upload_date = models.DateField(null=True)
+
+    class Meta:
+        unique_together = ('story', 'number')
+
+# Read Record Model
+class Read_Record(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    type = models.CharField(choices=[("DROP","Dropped"), ("TO_READ","To Read"), ("MARK_READ",'Read')], max_length = 10)
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
+    read_time = models.DateTimeField(auto_now=True)

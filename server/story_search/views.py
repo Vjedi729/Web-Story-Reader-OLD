@@ -23,16 +23,36 @@ def search_api(request):
     myjson = '{ "results":[\n'
     for story in results.all():
         wsr_story = WSR_Story(StoryType.DB, story)
-        myjson += "\n" + wsr_story.toJson() + ","
+        myjson += "\n" + wsr_story.toJson(indent=2) + ","
     myjson = myjson[:-1] + '\n] }'
     return HttpResponse(myjson, content_type='application/json')
 
+# FIXME: Missing User Checking
+import story_search.json_utils as j
 def read_list_api(request):
     if request.method == 'GET':
-        return HttpResponse('')
+        recs = Read_Record.objects.all()
+
+        to_read = recs.filter(type="TO_READ")
+        read = recs.filter(type="MARK_READ")
+        tr_json = j.list_to_json_list([WSR_Story(StoryType.DB, rec.chapter.story) for rec in to_read])
+
+        resp_json = '{ "to_read":'+tr_json+'}'
+        return HttpResponse(resp_json, content_type='application/json')
     elif request.method == 'POST':
         r_json = request.body
         r_dict = json.loads(r_json)
-        r_type = r_dict.get('type')
-        r_story_id = r_dict.get('story_id')
+        r_type = str(r_dict.get('type'))
+        r_story_id = int(r_dict.get('story_id'))
+        r_chapter_num = int(r_dict.get('chap_num', default=1))
+        #try:
+        chap = Chapter.objects.get(story = r_story_id, number = r_chapter_num)
+        #except Chapter.DoesNotExist:
+        #   pass
+        try:
+            read_rec = Read_Record.objects.get(chapter=chap, type = r_type)
+            read_rec.delete()
+        except Read_Record.DoesNotExist:
+            read_rec = Read_Record(chapter=chap)
+            read_rec.save()
         return HttpResponse('')
