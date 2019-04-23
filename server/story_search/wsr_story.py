@@ -198,7 +198,7 @@ class WSR_Story:
                 s.characters.add(dbChar)
         #TODO: Add Relationships
         for r_names in self.relationships:
-            print(r_names)
+            #print(r_names)
             dbChars = []
             for c_name in r_names:
                 try:
@@ -211,7 +211,7 @@ class WSR_Story:
                     dbChar.save()
                 finally:
                     dbChars.append(dbChar)
-            print(dbChars)
+            #print(dbChars)
             cand_rel = Relationship.objects.annotate(c=Count('characters')).filter(c=len(dbChars))
             for character in dbChars:
                 if cand_rel.count() <= 0:
