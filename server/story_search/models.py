@@ -7,6 +7,10 @@ from datetime import date
 class Ao3_Fandom(models.Model):
     name = models.CharField(max_length=255)
     url = models.URLField(primary_key = True)
+    fics_scanned = models.IntegerField(Field.default = 0)
+
+    def __str__(self):
+        return str(name) + " Fandom (" + str(fics_scanned) + ")" 
 
 class Ao3_Story_Tracker(models.Model):
     url = models.URLField(primary_key=True)

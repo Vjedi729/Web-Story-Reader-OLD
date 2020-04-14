@@ -8,6 +8,7 @@ import urllib
 from bs4 import BeautifulSoup
 import json
 import time
+import datetime.date as date
 
 from .scrapers import Ao3_Story, FFnet_Story
 from .wsr_story import WSR_Story, StoryType
@@ -19,13 +20,18 @@ class Ao3_Crawler:
     test_fandom_list = "https://archiveofourown.org/media/Anime%20*a*%20Manga/fandoms"
     test_fandom = "https://archiveofourown.org/tags/1984%20-%20George%20Orwell/works"
 
-    def __init__(self, delay = 0.75, limit=None, skip = 0):
+    def __init__(self, delay = 0.75, limit=None, fandom_check=False, skip = 0):
+        self.last_check = date.min
+        self.crawl(delay, limit, fandom_check, skip)
+
+    def crawl(self, delay = 0.75, limit=None, fandom_check=False, skip = 0):
         if limit is not None:
             start_time = time.time()
             self.story_list = []
 
-        for name, url in Ao3_Crawler.parse_one_fandom_list(Ao3_Crawler.test_fandom_list):
-            Ao3_Fandom(name=name, url=url).save()
+        if fandom_check:
+            for name, url in Ao3_Crawler.parse_one_fandom_list(Ao3_Crawler.test_fandom_list):
+                Ao3_Fandom(name=name, url=url, complete = False).save()
 
         pages_read = 0
         fandoms_read = 0
@@ -66,6 +72,9 @@ class Ao3_Crawler:
                     time.sleep(delay - (time.time()-load_time))
             if Ao3_Crawler.debug:
                 print("")
+            fandom.update(complete = True)
+        self.last_check = date.today()
+
     def toJson(self):
         myjson = '[\n'
         for story in self.story_list:
@@ -97,7 +106,8 @@ class Ao3_Crawler:
 
         return fandoms
 
-    def parse_one_fandom(fandom_page_1_url, delay = 1):
+    # TODO: Add Skip functionality
+    def parse_one_fandom(fandom_page_1_url, delay = 1, skip = 0):
         curr_page_url = fandom_page_1_url
         stories = []
         i = 0
@@ -125,9 +135,11 @@ class Ao3_Crawler:
             #Collect URLs
             info_boxes = inner_main.find_all('li', {'class':'work blurb group', 'role':'article'})
             for ib in info_boxes:
-                title_box = ib.find('h4', {'class':'heading'})
+                header_box = ib.find('div', {'class':'header module'})
+                title_box = header_box.find('h4', {'class':'heading'})
                 title = title_box.find('a')
-                stories.append( (title.text, Ao3_Crawler.base_site+title.get("href")) )
+                update_date = header_box.find('p')
+                stories.append( (title.text, Ao3_Crawler.base_site+title.get("href"), update_date.text) )
 
             # Find next page
             temp = inner_main.find('ol', {'class':'pagination actions'})
